@@ -8,6 +8,7 @@ ROLE_CHOICES = [
         ('MODERATOR', 'Moderator')
     ]
 
+
 class User(AbstractUser):
     username = models.ForeignKey(blank=False) 
     email = models.EmailField(blank=False)

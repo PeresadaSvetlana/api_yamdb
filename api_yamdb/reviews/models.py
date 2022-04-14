@@ -1,5 +1,5 @@
 from django.db import models
-from models import User
+from users.models import User
 
 
 class Categories(models.Model):
@@ -60,15 +60,15 @@ class Titles(models.Model):
     def __str__(self):
         return self.name
 
+
 class Comments(models.Model):
-    review_id = ?
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
+
 class Review(models.Model):
-    title_id = ?
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='review')
