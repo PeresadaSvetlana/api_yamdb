@@ -4,9 +4,9 @@ from rest_framework.pagination import LimitOffsetPagination
 from django.core.mail import send_mail
 
 from rest_framework.response import Response
-from rest_framework import status
-from .permissions import IsAdminOrReadOnly, IsAuthenticated, IsAdminOnly
-from .models import Categories, Genres, Titles, User
+from rest_framework import status, permissions
+from .permissions import IsAdminOrReadOnly, IsAdminOnly
+from review.models import Categories, Genres, Titles, User
 from .serializers import (CategoriesSerializer, GenresSerializer,
                 TitlesSerializer, SignUpSerializer, ObtainTokenSerializer,UserSerializer)
 
@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (
-        IsAuthenticated,
+        permissions.IsAuthenticated,
         IsAdminOnly,
     )
     lookup_field = 'username'

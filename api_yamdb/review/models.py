@@ -42,19 +42,14 @@ class Titles(models.Model):
         verbose_name='Описание')
     genre = models.ManyToManyField(
         Genres,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='api',
-        verbose_name='Жанр'
     )
     category = models.ForeignKey(
         Categories,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='api',
-        verbose_name='Жанр'
+        related_name='review',
+        verbose_name='Категория'
     )
 
     def __str__(self):
@@ -72,5 +67,5 @@ class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='review')
-    score = models.AutoField(related_name='score')
+    score = models.TextField()
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)

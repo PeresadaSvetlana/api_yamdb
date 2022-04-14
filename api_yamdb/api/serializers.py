@@ -1,4 +1,5 @@
-from .models import Categories, Genres, Titles
+from review.models import Categories, Genres, Titles
+from users.models import User
 from rest_framework import serializers
 
 

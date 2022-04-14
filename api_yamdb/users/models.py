@@ -10,9 +10,9 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
-    username = models.ForeignKey(blank=False) 
+    
     email = models.EmailField(blank=False)
-    role = models.CharField(choices=ROLE_CHOICES,
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES,
         default=USER)
     bio = models.TextField('Биография', blank=True) 
     first_name = models.CharField(max_length=20, blank=True)

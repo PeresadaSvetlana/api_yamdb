@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
-    'reviews',
+    'review',
     'rest_framework',
     'djoser',
     'users',
@@ -127,4 +127,4 @@ SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('Bearer',),
 } 
 
-AUTH_USER_MODEL = 'rewiew.User'
+AUTH_USER_MODEL = 'users.User'
