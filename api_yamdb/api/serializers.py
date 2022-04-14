@@ -1,4 +1,4 @@
-from .models import Categories, Genres, Titles
+from .models import Categories, Genres, Titles, User
 from rest_framework import serializers
 
 
@@ -21,6 +21,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Titles
+
 
 class UserSerializer(serializers.ModelSerializer):
 

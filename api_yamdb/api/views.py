@@ -8,7 +8,9 @@ from rest_framework import status
 from .permissions import IsAdminOrReadOnly, IsAuthenticated, IsAdminOnly
 from .models import Categories, Genres, Titles, User
 from .serializers import (CategoriesSerializer, GenresSerializer,
-                TitlesSerializer, SignUpSerializer, ObtainTokenSerializer,UserSerializer)
+                          TitlesSerializer, SignUpSerializer,
+                          ObtainTokenSerializer, UserSerializer
+                          )
 
 
 class CategoriesViewSet(viewsets.ModelViewSet):
@@ -41,22 +43,23 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     lookup_field = 'username'
 
+
 class APISignUp(APIView):
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             send_mail(
-        'Тема письма',
-        'Текст письма.',
-        'from@example.com',
-        ['to@example.com'],
-        fail_silently=False,
-)
+                'Тема письма',
+                'Текст письма.',
+                'from@example.com',
+                ['to@example.com'],
+                fail_silently=False,
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class APIObtainToken(APIView):
     def post(self, request):
         serializer = ObtainTokenSerializer(data=request.data)
-        
