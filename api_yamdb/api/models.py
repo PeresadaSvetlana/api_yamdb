@@ -39,7 +39,7 @@ class Titles(models.Model):
         blank=True,
         null=True,
         verbose_name='Описание')
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genres,
         on_delete=models.SET_NULL,
         blank=True,
