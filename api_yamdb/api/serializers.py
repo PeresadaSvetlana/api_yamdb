@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-from .models import Categories, Genres, Titles, User
-=======
 from review.models import Categories, Genres, Titles
 from users.models import User
->>>>>>> f15634f0faef602ef8b1d5e605d57299a2adbd1d
 from rest_framework import serializers
 
 
