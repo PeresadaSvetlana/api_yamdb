@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from review.models import Categories, Genres, Titles
 from users.models import User
-=======
-from review.models import Categories, Genres, Titles
-from users.models import User
-from rest_framework import serializers
->>>>>>> ae03824cc631b121a7ec5770cd5b7ee7e1d092e9
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
