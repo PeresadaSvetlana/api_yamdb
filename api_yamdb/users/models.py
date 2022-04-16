@@ -16,11 +16,19 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
+<<<<<<< HEAD
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(blank=False, unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES,
                             default=USER)
     bio = models.TextField(max_length=1000, blank=True)
+=======
+    username = models.CharField(max_length=200, unique=True)
+    email = models.EmailField(blank=False)
+    role = models.CharField(max_length=100, choices=ROLE_CHOICES,
+        default=USER)
+    bio = models.TextField('Биография', blank=True) 
+>>>>>>> ae03824cc631b121a7ec5770cd5b7ee7e1d092e9
     first_name = models.CharField(max_length=20, blank=True)
     last_name = models.CharField(max_length=20, blank=True)
     confirmation_code = models.CharField(max_length=14, default='1234')
