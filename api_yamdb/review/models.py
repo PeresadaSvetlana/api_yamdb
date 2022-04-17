@@ -8,6 +8,7 @@ class Categories(models.Model):
         verbose_name='Наименование категории'
     )
     slug = models.SlugField(
+        max_length=50,
         unique=True,
         verbose_name='Название')
 
