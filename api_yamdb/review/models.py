@@ -57,16 +57,24 @@ class Titles(models.Model):
         return self.name
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Comments(models.Model):
-    text = models.TextField()
+    text = models.TextField('Текст комментария', max_length=200)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
-
-
-class Review(models.Model):
-    text = models.TextField()
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='review')
-    score = models.TextField()
+        User, on_delete=models.CASCADE,
+        related_name='comments'
+    )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)

@@ -1,7 +1,3 @@
-from datetime import datetime, timedelta
-
-import jwt
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -34,22 +30,8 @@ class User(AbstractUser):
         return self.username
 
     @property
-    def token(self):
-        return self._generate_jwt_token()
-
-    def _generate_jwt_token(self):
-        dt = datetime.now() + timedelta(days=60)
-
-        token = jwt.encode({
-            'id': self.pk,
-            'exp': int(dt.strftime('%s'))
-        }, settings.SECRET_KEY, algorithm='HS256')
-
-        return token.decode('utf-8')
-
-    @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.is_superuser or self.role == ADMIN
 
     @property
     def is_moderator(self):

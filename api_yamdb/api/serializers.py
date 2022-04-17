@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from review.models import Categories, Genres, Titles
+from review.models import Categories, Genres, Titles, Comments
 from users.models import User
 import datetime as dt
 
@@ -33,6 +33,13 @@ class TitlesSerializer(serializers.ModelSerializer):
         return data
 
 
+class CommentsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('review', 'author')
+        model = Comments
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -46,9 +53,10 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username')
 
-    def validate(self, value):
-        if value == 'me':
+    def validate(self, data):
+        if data['username'] == 'me':
             raise ValidationError(message='Запрещенное имя пользователя!')
+        return data
 
 
 class ObtainTokenSerializer(serializers.ModelSerializer):
@@ -56,3 +64,18 @@ class ObtainTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
+
+
+class UserSerializerReadOnly(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'email',
+            'role'
+        )
+        model = User

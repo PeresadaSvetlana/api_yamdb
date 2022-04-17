@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters, status, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 import uuid
-
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework import filters, permissions, status, viewsets, mixins
@@ -10,13 +10,15 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from review.models import Categories, Genres, Titles, User
+from review.models import Categories, Genres, Titles, User, Comments
 from rest_framework import mixins
 
-from .permissions import IsAdminOrReadOnly, IsAdminOrSuperOnly
+from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperOnly,
+                          StaffOrAuthorOrReadOnly)
 from .serializers import (CategoriesSerializer, GenresSerializer,
                           ObtainTokenSerializer, SignUpSerializer,
-                          TitlesSerializer, UserSerializer)
+                          TitlesSerializer, UserSerializer, CommentsSerializer,
+                          UserSerializerReadOnly)
 
 
 class CategoriesViewSet(mixins.CreateModelMixin,
@@ -64,23 +66,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET', 'PATCH'],
             detail=False,
-            permission_classes=(permissions.IsAuthenticated,),
+            permission_classes=[permissions.IsAuthenticated],
             url_path='me')
     def change_info(self, request):
-        serializer = UserSerializer(request.user)
         if request.method == 'PATCH':
-            if request.user.is_admin:
-                serializer = UserSerializer(
-                    request.user,
-                    data=request.data,
-                    partial=True)
+            serializer = UserSerializerReadOnly(
+                request.user,
+                data=request.data,
+                partial=True
+            )
             serializer.is_valid()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class APISignUp(APIView):
+
     def post(self, request):
         confirmation_code = str(uuid.uuid4())
         serializer = SignUpSerializer(data=request.data)
