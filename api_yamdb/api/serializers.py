@@ -57,13 +57,6 @@ class TitleWriteSerializer(TitlesSerializer):
     )
 
 
-class CommentsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('review', 'author')
-        model = Comments
-
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -103,6 +96,8 @@ class UserSerializerReadOnly(serializers.ModelSerializer):
             'role'
         )
         model = User
+
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
@@ -118,3 +113,15 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Поставьте оценку от 1 до 10!')
         return value
+
+
+class CommentsSerializer(serializers.ModelSerializer):
+
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'pub_date')
+        model = Comments

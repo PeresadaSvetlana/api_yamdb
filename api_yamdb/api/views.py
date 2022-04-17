@@ -1,4 +1,3 @@
-import uuid
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -9,19 +8,18 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from review.models import Categories, Genres, Titles, User, Comments
+from review.models import Categories, Genres, Titles, User, Review
 from rest_framework import mixins
 
 from .serializers import (CategoriesSerializer, GenresSerializer,
                           ObtainTokenSerializer, SignUpSerializer,
                           TitlesSerializer, UserSerializer, CommentsSerializer,
-                          UserSerializerReadOnly, TitleWriteSerializer, 
+                          UserSerializerReadOnly, TitleWriteSerializer,
                           ReviewSerializer)
 
 from .filters import TitleFilter
 from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperOnly,
-                          IsAdminModeratorAuthororReadOnly,
-                          StaffOrAuthorOrReadOnly)
+                          IsAdminModeratorAuthororReadOnly)
 
 
 class CategoriesViewSet(mixins.CreateModelMixin,
@@ -90,16 +88,16 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class APISignUp(APIView):
-
     def post(self, request):
-        confirmation_code = str(uuid.uuid4())
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            user_data = serializer.validated_data
+            user = get_object_or_404(username=user_data['username'])
             send_mail(
                 'Ваш код',
                 'Для получения токена',
-                f'{confirmation_code}',
+                f'{user.confirmation_code}',
                 [serializer.data['email']],
                 fail_silently=False,
             )
@@ -108,7 +106,6 @@ class APISignUp(APIView):
 
 
 class APIObtainToken(APIView):
-
     def post(self, request):
         serializer = ObtainTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -132,3 +129,27 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perfom_create(self, serializer):
         serializer.save(author=self.request.user,
                         title=get_object_or_404(Titles, pk=self.kwargs.get('id')))
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAdminModeratorAuthororReadOnly,)
+    serializer_class = CommentsSerializer
+    pagination_class = LimitOffsetPagination
+
+    def get_queryset(self):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id')
+        )
+        queryset = review.comments.all()
+        return queryset
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id')
+        )
+        serializer.save(
+            author=self.request.user,
+            review=review
+        )
