@@ -1,5 +1,7 @@
 from django.db import models
 from users.models import User
+import datetime as dt
+from django.core.exceptions import ValidationError
 
 
 class Categories(models.Model):
@@ -14,6 +16,9 @@ class Categories(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['-id']
 
 
 class Genres(models.Model):
@@ -30,6 +35,9 @@ class Genres(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['-id']
+
 
 class Titles(models.Model):
     name = models.CharField(
@@ -42,39 +50,78 @@ class Titles(models.Model):
         null=True,
         verbose_name='Описание')
     genre = models.ManyToManyField(
-        Genres,
+        Genres, related_name='genre', through='GenreTitle'
     )
     category = models.ForeignKey(
         Categories,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='review',
+        related_name='title',
         verbose_name='Категория'
     )
 
     def __str__(self):
         return self.name
 
+    def validate(year):
+        if dt.datetime.now().year <= year:
+            raise ValidationError(
+                'Этот год еще не наступил!'
+            )
+        return year
+
+    class Meta:
+        ordering = ['-id']
 
 
+class GenreTitle(models.Model):
+    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
 
 
+class Review(models.Model):
+    title = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE,
+        related_name='review',
+        blank=True,
+        null=True
+    )
+    text = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='review')
+    score = models.IntegerField(
+        'Оценка',
+        default=0
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
 
-
-
-
-
-
-
-
-
+    class Meta:
+        ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'], name="unique_review")
+        ]
 
 
 class Comments(models.Model):
-    text = models.TextField('Текст комментария', max_length=200)
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name='comments'
+    review = models.ForeignKey(
+        Review, on_delete=models.CASCADE,
+        related_name='comments',
+        blank=True,
+        null=True
     )
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    text = models.TextField()
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.author
