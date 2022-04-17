@@ -1,18 +1,22 @@
 from rest_framework import viewsets, filters, status, permissions
-from rest_framework.views import APIView
-from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+import uuid
 
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from rest_framework import filters, permissions, status, viewsets, mixins
+from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework import status, permissions
-from .permissions import IsAdminOrReadOnly, IsAdminOnly
+from rest_framework.views import APIView
 from review.models import Categories, Genres, Titles, User
 from rest_framework import mixins
+
+from .permissions import IsAdminOrReadOnly, IsAdminOrSuperOnly
 from .serializers import (CategoriesSerializer, GenresSerializer,
-                          TitlesSerializer, SignUpSerializer,
-                          ObtainTokenSerializer, UserSerializer
-                          )
+                          ObtainTokenSerializer, SignUpSerializer,
+                          TitlesSerializer, UserSerializer)
 
 
 class CategoriesViewSet(mixins.CreateModelMixin,
@@ -51,21 +55,42 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (
         permissions.IsAuthenticated,
-        IsAdminOnly,
+        IsAdminOrSuperOnly,
     )
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
     lookup_field = 'username'
+
+    @action(methods=['GET', 'PATCH'],
+            detail=False,
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path='me')
+    def change_info(self, request):
+        serializer = UserSerializer(request.user)
+        if request.method == 'PATCH':
+            if request.user.is_admin:
+                serializer = UserSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class APISignUp(APIView):
     def post(self, request):
+        confirmation_code = str(uuid.uuid4())
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             send_mail(
-                'Тема письма',
-                'Текст письма.',
-                'from@example.com',
-                ['to@example.com'],
+                'Ваш код',
+                'Для получения токена',
+                f'{confirmation_code}',
+                [serializer.data['email']],
                 fail_silently=False,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -73,5 +98,14 @@ class APISignUp(APIView):
 
 
 class APIObtainToken(APIView):
+
     def post(self, request):
         serializer = ObtainTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        user = User.objects.get(username=data['username'])
+        if data.get('confirmation_code') == user.confirmation_code:
+            token = default_token_generator.make_token(request.user)
+            return Response({'token': str(token)},
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
