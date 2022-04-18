@@ -4,7 +4,7 @@ import datetime as dt
 from django.core.exceptions import ValidationError
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Наименование категории'
@@ -21,7 +21,7 @@ class Categories(models.Model):
         ordering = ['-id']
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Наименование жанра'
@@ -39,7 +39,7 @@ class Genres(models.Model):
         ordering = ['-id']
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name='Наименование'
@@ -50,10 +50,10 @@ class Titles(models.Model):
         null=True,
         verbose_name='Описание')
     genre = models.ManyToManyField(
-        Genres, related_name='genre', through='GenreTitle'
+        Genre, related_name='genre', through='GenreTitle'
     )
     category = models.ForeignKey(
-        Categories,
+        Category,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -76,13 +76,13 @@ class Titles(models.Model):
 
 
 class GenreTitle(models.Model):
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Titles,
+        Title,
         on_delete=models.CASCADE,
         related_name='review',
         blank=True,
@@ -108,7 +108,7 @@ class Review(models.Model):
         ]
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     review = models.ForeignKey(
         Review, on_delete=models.CASCADE,
         related_name='comments',
