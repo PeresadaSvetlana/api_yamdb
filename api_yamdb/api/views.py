@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from review.models import Category, Genre, Title, Review
 from users.models import User
 from rest_framework import mixins
-
+from rest_framework.permissions import IsAuthenticated
 from .serializers import (CategorySerializer, GenreSerializer,
                           ObtainTokenSerializer, SignUpSerializer,
                           TitleSerializer, UserSerializer, CommentSerializer,
@@ -19,7 +19,7 @@ from .serializers import (CategorySerializer, GenreSerializer,
                           ReviewSerializer)
 
 from .filters import TitleFilter
-from .permissions import (IsAdminOrReadOnly,
+from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperOnly,
                           IsAdminModeratorAuthororReadOnly, IsAdmin)
 
 
@@ -68,6 +68,19 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
+
+    @action(methods=['post'],
+            detail=False,
+            permission_classes=(IsAuthenticated, IsAdminOrSuperOnly,))
+    def create_user(self, request):
+        serializer = UserSerializerReadOnly(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['GET', 'PATCH'],
             detail=False,
