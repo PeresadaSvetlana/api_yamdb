@@ -55,8 +55,12 @@ class TitleWriteSerializer(TitleSerializer):
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = '__all__'
         model = User
+        fields = (
+            'username', 'email',
+            'first_name', 'last_name',
+            'bio', 'role'
+        )
 
 
 class SignUpSerializer(serializers.ModelSerializer):
