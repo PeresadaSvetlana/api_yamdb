@@ -102,7 +102,7 @@ class APISignUp(APIView):
                 [serializer.data['email']],
                 fail_silently=False
             )
-            return Response(serializer.data['confirmation_code'],
+            return Response(serializer.data,
                             status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors,
