@@ -8,7 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from review.models import Category, Genre, Title, User, Review
+from review.models import Category, Genre, Title, Review
+from users.models import User
 from rest_framework import mixins
 
 from .serializers import (CategorySerializer, GenreSerializer,
@@ -138,13 +139,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('id'))
-        return title.reviews.all()
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.review.all()
 
     def perfom_create(self, serializer):
         serializer.save(
             author=self.request.user,
-            title=get_object_or_404(Title, pk=self.kwargs.get('id'))
+            title=get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         )
 
 
