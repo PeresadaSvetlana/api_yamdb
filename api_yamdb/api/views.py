@@ -64,7 +64,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
-    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     lookup_field = 'username'
@@ -87,16 +86,22 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated],
             url_path='me')
     def change_info(self, request):
+        serializer = UserSerializer(request.user)
         if request.method == 'PATCH':
-            serializer = UserSerializerReadOnly(
-                request.user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid()
+            if request.user.role == 'admin' or request.user.is_staff:
+                serializer = UserSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            else:
+                serializer = UserSerializerReadOnly(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
 
 class APISignUp(APIView):
@@ -128,8 +133,8 @@ class APIObtainToken(APIView):
         serializer = ObtainTokenSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             try:
-                user = User.objects.get(
-                    username=serializer.validated_data['username']
+                user = get_object_or_404(
+                    User, username=serializer.validated_data['username']
                 )
             except User.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)

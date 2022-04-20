@@ -1,13 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-USER = 'User'
-ADMIN = 'Admin'
-MODERATOR = 'Moderator'
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
 ROLE_CHOICES = [
-    ('USER', 'User'),
-    ('ADMIN', 'Admin'),
-    ('MODERATOR', 'Moderator')
+    (USER, USER),
+    (ADMIN, ADMIN),
+    (MODERATOR, MODERATOR)
 ]
 
 
@@ -27,7 +27,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_superuser or self.role == ADMIN
+        return self.role == ADMIN
 
     @property
     def is_moderator(self):
