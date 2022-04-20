@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from review.models import Category, Genre, Title, Comment, Review
 from users.models import User
-from django.db.models import Avg
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,14 +24,8 @@ class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description',
-                  'genre', 'category')
+        fields = '__all__'
         model = Title
-
-    def get_rating(self, obj):
-        reviews = Review.objects.filter(title=obj).all()
-        rating = reviews.aggregate(Avg('score')).get('score__avg')
-        return rating
 
 
 class TitleWriteSerializer(TitleSerializer):
@@ -46,10 +39,6 @@ class TitleWriteSerializer(TitleSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
-
-    class Meta:
-        fields = '__all__'
-        model = Title
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -106,6 +95,16 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date', )
         model = Review
+
+    def validate(self, data):
+        title = self.context.get('title')
+        request = self.context.get('request')
+        if (
+            request.method != 'PATCH' and
+            Review.objects.filter(title=title, author=request.user).exists()
+        ):
+            raise serializers.ValidationError('Вы уже добавили оценку!')
+        return data
 
     def validate_score(self, value):
         if value < 1 and value > 10:
