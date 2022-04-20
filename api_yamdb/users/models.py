@@ -25,14 +25,5 @@ class User(AbstractUser):
 
         return self.username
 
-    @property
-    def is_admin(self):
-        return self.role == ADMIN
-
-    @property
-    def is_moderator(self):
-        return self.role == MODERATOR
-
-    @property
-    def is_user(self):
-        return self.role == USER
+    class Meta:
+        ordering = ['id']

@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from review.models import Category, Genre, Title, Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 
@@ -100,8 +100,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         title = self.context.get('title')
         request = self.context.get('request')
         if (
-            request.method != 'PATCH' and
-            Review.objects.filter(title=title, author=request.user).exists()
+            request.method != 'PATCH'
+            and Review.objects.filter(
+                title=title, author=request.user
+            ).exists()
         ):
             raise serializers.ValidationError('Вы уже добавили оценку!')
         return data

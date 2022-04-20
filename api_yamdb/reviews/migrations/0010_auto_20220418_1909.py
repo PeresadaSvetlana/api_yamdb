@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
     atomic = False
 
     dependencies = [
-        ('review', '0009_auto_20220417_1952'),
+        ('reviews', '0009_auto_20220417_1952'),
     ]
 
     operations = [

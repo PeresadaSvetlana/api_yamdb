@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('review', '0007_genretitle'),
+        ('reviews', '0007_genretitle'),
     ]
 
     operations = [
         migrations.RemoveField(
             model_name='titles',
             name='genre',
-            field=models.ManyToManyField(related_name='genre', through='review.GenreTitle', to='review.Genres'),
+            field=models.ManyToManyField(related_name='genre', through='reviews.GenreTitle', to='reviews.Genres'),
         ),
     ]

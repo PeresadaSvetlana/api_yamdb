@@ -7,18 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('review', '0008_auto_20220417_1948'),
+        ('reviews', '0008_auto_20220417_1948'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='titles',
             name='genre',
-            field=models.ManyToManyField(related_name='genre', through='review.GenreTitle', to='review.Genres'),
+            field=models.ManyToManyField(related_name='genre', through='reviews.GenreTitle', to='reviews.Genres'),
         ),
         migrations.AlterField(
             model_name='titles',
             name='category',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='title', to='review.Categories', verbose_name='Категория'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='title', to='reviews.Categories', verbose_name='Категория'),
         ),
     ]

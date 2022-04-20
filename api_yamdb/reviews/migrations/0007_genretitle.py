@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('review', '0006_auto_20220417_1941'),
+        ('reviews', '0006_auto_20220417_1941'),
     ]
 
     operations = [
@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
             name='GenreTitle',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='review.Genres')),
-                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='review.Titles')),
+                ('genre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Genres')),
+                ('title', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reviews.Titles')),
             ],
         ),
     ]

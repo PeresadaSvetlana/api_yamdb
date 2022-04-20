@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('review', '0003_auto_20220417_1819'),
+        ('reviews', '0003_auto_20220417_1819'),
     ]
 
     operations = [
@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='titles',
             name='genre',
-            field=models.ManyToManyField(related_name='genre', to='review.Genres'),
+            field=models.ManyToManyField(related_name='genre', to='reviews.Genres'),
         ),
     ]
