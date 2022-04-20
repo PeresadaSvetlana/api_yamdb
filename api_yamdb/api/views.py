@@ -1,27 +1,27 @@
-from django.shortcuts import get_object_or_404
 import uuid
+
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from review.models import Category, Genre, Title, Review
+from review.models import Category, Genre, Review, Title
 from users.models import User
-from django.db.models import Avg
-from rest_framework import mixins
-from rest_framework.permissions import IsAuthenticated
-from .serializers import (CategorySerializer, GenreSerializer,
-                          ObtainTokenSerializer, SignUpSerializer,
-                          TitleSerializer, UserSerializer, CommentSerializer,
-                          UserSerializerReadOnly, TitleWriteSerializer,
-                          ReviewSerializer)
 
 from .filters import TitleFilter
-from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperOnly,
-                          IsAdminModeratorAuthororReadOnly, IsAdmin)
+from .permissions import (IsAdmin, IsAdminModeratorAuthororReadOnly,
+                          IsAdminOrReadOnly, IsAdminOrSuperOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ObtainTokenSerializer,
+                          ReviewSerializer, SignUpSerializer, TitleSerializer,
+                          TitleWriteSerializer, UserSerializer,
+                          UserSerializerReadOnly)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
