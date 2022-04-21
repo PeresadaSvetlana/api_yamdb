@@ -44,7 +44,7 @@ class Title(models.Model):
         max_length=256,
         verbose_name='Наименование'
     )
-    year = models.IntegerField()
+    year = models.IntegerField(db_index=True)
     description = models.TextField(
         blank=True,
         null=True,
@@ -61,6 +61,9 @@ class Title(models.Model):
         verbose_name='Категория'
     )
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.name
 
@@ -70,9 +73,6 @@ class Title(models.Model):
                 'Этот год еще не наступил!'
             )
         return year
-
-    class Meta:
-        ordering = ['-id']
 
 
 class GenreTitle(models.Model):
@@ -97,6 +97,7 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
+        db_index=True,
         auto_now_add=True
     )
 
@@ -120,6 +121,7 @@ class Comment(models.Model):
         User, on_delete=models.CASCADE, related_name='comments')
     pub_date = models.DateTimeField(
         'Дата публикации',
+        db_index=True,
         auto_now_add=True
     )
 

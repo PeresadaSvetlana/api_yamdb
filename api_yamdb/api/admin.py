@@ -26,7 +26,7 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = list_display = (
-        'name', 'year', 'description', 'genre', 'category'
+        'name', 'year', 'description', 'category'
     )
     empty_value_display = '-пусто-'
 
