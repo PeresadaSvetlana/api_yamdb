@@ -23,28 +23,24 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           UserSerializerReadOnly)
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
-                      mixins.ListModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class MixinsViewSet(mixins.CreateModelMixin,
+                    mixins.ListModelMixin,
+                    mixins.DestroyModelMixin,
+                    viewsets.GenericViewSet):
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=name',)
+    lookup_field = ('slug')
+    permission_classes = (IsAdminOrReadOnly,)
+
+
+class CategoryViewSet(MixinsViewSet):
     queryset = Category.objects.all()
-    permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('=name',)
     serializer_class = CategorySerializer
-    lookup_field = ('slug')
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(MixinsViewSet):
     queryset = Genre.objects.all()
-    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('=name',)
-    lookup_field = ('slug')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
