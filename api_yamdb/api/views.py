@@ -66,7 +66,7 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     lookup_field = 'username'
 
-    @action(methods=['post'],
+    @action(methods=['POST'],
             detail=False,
             permission_classes=(IsAuthenticated, IsAdminOrSuperOnly,))
     def create_user(self, request):
